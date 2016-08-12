@@ -10,7 +10,7 @@ def home():
     return "hello niggas"
 
 
-@app.route('/user/<username>', methods=['GET', 'POST', 'DELETE'])
+@app.route('/user/<username>', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def handle_user(username):
     user_dict = {"username": username}
     collection = "users"
@@ -28,4 +28,4 @@ def handle_user(username):
 
     mongo.disconnect()
 
-app.run('0.0.0.0', 0)
+app.run('0.0.0.0', 8080)
