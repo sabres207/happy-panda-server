@@ -3,6 +3,12 @@ from encodejson import jsonify
 
 import mongodal
 import recipeshelper
+import unicodedata
+
+RECIPE_HTML = '<div><h1>{0}</h1><h3>{1}</h3><h3>amount of servings: {2}</h3><h2>Ingredients</h2>' \
+              '<ul style="list-style-type:circle">{3}</ul><h2>Directions</h2><ol>{4}</ol><p>rating: {5}/5</p>' \
+              '<p>difficulty: {6}</p><p>preperation time: {7} minutes</p></div>'
+LI_HTML = "<li>{0}</li>"
 
 mongo = mongodal.MongoDAL()
 rhelper = recipeshelper.RecipesHelper()
@@ -24,24 +30,30 @@ def get_dish(dish_id):
     return jsonify(result)
 
 
-@dishes_controller.route("/list_dishes_general/<hour>", methods=['GET'])
-def list_dishes_general(hour):
+@dishes_controller.route("/", methods=['GET'])
+def list_dishes_general():
+    hour = request.args.get("hour")
+    if hour is None:
+        return []
+    user = request.args.get("user")
     dishes_for_now = list_dishes(hour)
-    result = sort_by_health(dishes_for_now)
-    return jsonify(result)
 
+    if user is not None:
+        sorted_list = sort_by_health_for_user(dishes_for_now, user)
+    else:
+        sorted_list = sort_by_health(dishes_for_now)
 
-@dishes_controller.route("/list_dishes_for_user/<hour>/<user>", methods=['GET'])
-def list_dishes_for_user(hour, user):
-    dishes_for_now = list_dishes(hour)
-    result = sort_by_health_for_user(dishes_for_now, user)
-    return jsonify(result)
+    for dish in sorted_list:
+        add_html_description(dish)
+
+    return jsonify(sorted_list)
+
 
 
 def hour_to_meal(hour):
-    if hour < 11:
+    if 4 < hour <= 11:
         return 0
-    elif hour < 16:
+    elif 11 < hour <= 16:
         return 1
     else:
         return 2
@@ -83,3 +95,34 @@ def list_dishes(hour):
         return {}
     finally:
         mongo.disconnect()
+
+
+def add_html_description(dish):
+    recipe = dish['recipe']
+    if recipe is not None:
+        dish_name = recipe.get('recipe_name')
+        recipe_description = recipe.get('recipe_description')
+        servings_amount = recipe.get('number_of_servings')
+
+        ingredients_list = recipe.get('ingredients').get('ingredient')
+        ingredients_li_string = ""
+        for ingr in ingredients_list:
+            ingr_description = ingr.get('ingredient_description')
+            if ingr_description is not None:
+                ingr_description = unicodedata.normalize('NFKD', ingr_description).encode('ascii', 'ignore')
+                ingredients_li_string += LI_HTML.format(ingr_description)
+
+        directionsn_list = recipe.get('directions').get('direction')
+        directions_li_string = ""
+        for direct in directionsn_list:
+            direct_description = direct.get('direction_description')
+            direct_description = unicodedata.normalize('NFKD', direct_description).encode('ascii', 'ignore')
+            directions_li_string += LI_HTML.format(direct_description)
+
+        difficulty = dish.get('difficulty')
+        preparation_time = dish.get('preparation_time_min')
+        rating = recipe.get('rating')
+
+        dish['html_description'] = RECIPE_HTML.format(dish_name, recipe_description, servings_amount,
+                                                      ingredients_li_string, directions_li_string, rating, difficulty,
+                                                      preparation_time)
