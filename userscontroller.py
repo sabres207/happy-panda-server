@@ -62,7 +62,7 @@ def get_user_status(username):
         return err
 
 
-@app.route('/user/<username>/meals', methods=['GET', 'POST'])  # post - { recipe_id: ID }
+@app.route('/user/<username>/meals', methods=['GET', 'POST'])  # POST params: { recipe_id: ID }
 def get_user_meals(username):
     try:
         user = get_user(username)
