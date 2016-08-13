@@ -14,27 +14,27 @@ dishes_controller = Blueprint('dishes_controller', __name__)
 def get_dish(dish_id):
     mongo.connect()
     try:
-        result = mongo.find_one(collection_name, {"_id": dish_id})
+        result = mongo.find_one(collection_name, {"fatsecret_id": dish_id})
     except Exception:
         result = {}
 
     mongo.disconnect()
 
-    return jsonify(result)
+    return str(result)
 
 
-@dishes_controller.route("/dish/list_dishes_general/<hour>", methods=['GET'])
+@dishes_controller.route("/list_dishes_general/<hour>", methods=['GET'])
 def list_dishes_general(hour):
     dishes_for_now = list_dishes(hour)
     result = sort_by_health(dishes_for_now)
-    return jsonify(result)
+    return str(result)
 
 
-@dishes_controller.route("/dish/list_dishes_for_user/<hour>/<user>", methods=['GET'])
+@dishes_controller.route("/list_dishes_for_user/<hour>/<user>", methods=['GET'])
 def list_dishes_for_user(hour, user):
     dishes_for_now = list_dishes(hour)
     result = sort_by_health_for_user(dishes_for_now, user)
-    return jsonify(result)
+    return str(result)
 
 
 def hour_to_meal(hour):
@@ -46,7 +46,7 @@ def hour_to_meal(hour):
         return 2
 
 
-def is_dish_for_now(meal, dish):
+def is_dish_for_now(dish, meal):
     meals = dish.get('meals')
     if meals is not None:
         return meal in meals
