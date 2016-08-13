@@ -33,8 +33,7 @@ men_nutritions_guides = {
     'sodium':  2.3,  # grams
     'fibre':  30,  # grams
     'cholesterol':  300,  # milligrams
-    'potassium':  5000,  # milligrams
-    'iron': 8  # mg
+    'potassium':  5000  # milligrams 'iron': 8  # mg
 }
 
 women_nutritions_guides = {
@@ -47,9 +46,28 @@ women_nutritions_guides = {
     'sodium':  2.3,  # grams
     'fibre':  25,  # grams
     'cholesterol':  300,  # milligrams
-    'potassium':  5000,  # milligrams
-    'iron': 17  # mg
+    'potassium':  5000  # milligrams 'iron': 17  # mg
 }
+
+'''
+   status API example
+    {
+    "energy": 12,
+    "protein":  50,
+    "fat":  70,
+    "carbohydrate":  93.2,
+    "saturated_fat": 30.4,
+    "sugar":  90.2,
+    "sodium":  42.3,
+    "fibre":  30,
+    "cholesterol":  76,
+    "potassium":  22,
+  "vitamin_a": 90,
+  "vitamin_c": 10,
+  "calcium": 23,
+  "iron": 12
+}
+'''
 
 
 def meal_id_to_obj(mealid):
