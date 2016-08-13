@@ -19,25 +19,29 @@ def update_one(collection, where, set_value):
         }
     )
 
+    mongo.disconnect()
+
     return result
 
-    mongo.disconnect()
 
 
 def get_user(username):
     user_dict = {"username": username}
     mongo.connect()
 
-    cursor = mongo.find(collection, user_dict)
-    users = [e for e in cursor]
-    if len(users) == 0:
-        raise Exception("There is no user {0}".format(username))
-    elif len(users) == 1:
-        return users[0]
-    else:
-        raise Exception("Why are there more than one {0}".format(username))
-
-    mongo.disconnect()
+    try:
+        cursor = mongo.find(collection, user_dict)
+        users = [e for e in cursor]
+        if len(users) == 0:
+            raise Exception("There is no user {0}".format(username))
+        elif len(users) == 1:
+            return users[0]
+        else:
+            raise Exception("Why are there more than one {0}".format(username))
+    except mongodal.MongoError as err_msg:
+        raise err_msg
+    finally:
+        mongo.disconnect()
 
 
 @users_controller.route('/user/<username>', methods=['GET'])
