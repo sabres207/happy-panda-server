@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, jsonify
+from flask import Flask, request, Response, jsonify, Blueprint
 import mongodal
 import dailyintakes
 
@@ -7,11 +7,7 @@ mongo.connect()
 
 app = Flask(__name__)
 collection = "users"
-
-
-@app.route('/', methods=['GET'])
-def home():
-    return "hello niggas"
+users_controller = Blueprint("users_controller", __name__)
 
 
 def get_user(username):
@@ -27,7 +23,7 @@ def get_user(username):
         raise Exception("Why are there more than one {0}".format(username))
 
 
-@app.route('/user/<username>', methods=['GET'])
+@users_controller.route('/user/<username>', methods=['GET'])
 def handle_user(username):
     try:
         return str(get_user(username))
@@ -35,7 +31,7 @@ def handle_user(username):
         return err
 
 
-@app.route('/user/<username>/status', methods=['GET'])
+@users_controller.route('/user/<username>/status', methods=['GET'])
 def get_user_status(username):
     try:
         user = get_user(username)
@@ -44,7 +40,7 @@ def get_user_status(username):
         return err
 
 
-@app.route('/user/<username>/meals', methods=['GET', 'POST'])  # POST params: { recipe_id: ID }
+@users_controller.route('/user/<username>/meals', methods=['GET', 'POST'])  # POST params: { recipe_id: ID }
 def get_user_meals(username):
     try:
         user = get_user(username)
@@ -61,7 +57,7 @@ def get_user_meals(username):
         return err
 
 
-@app.route('/user/<username>/meals/<index>', methods=['DELETE'])
+@users_controller.route('/user/<username>/meals/<index>', methods=['DELETE'])
 def delete_user_meal(username, index):
     try:
         if request.method == 'DELETE':
@@ -71,6 +67,3 @@ def delete_user_meal(username, index):
             return str(mongo.update_one(collection, user_dict, {'daily_meals': newmeals}))
     except Exception as err:
         return err
-
-
-app.run('0.0.0.0', 8080)

@@ -1,25 +1,11 @@
-# from fatsecret import Fatsecret
-# import sys
-# import json
-# method = sys.argv[1]
-# arguments = sys.argv[2:]
-#
-# fs = Fatsecret("21a6cd97e2644a00a7fc7c7d7ae00527", "392dba9edc6b40fe8ef11f860f9043f9")
-# Fatsecret()
-# for argument in arguments:
-#     with open(argument + "-" + method + ".txt", "w+") as f_out:
-#         if method == "search":
-#             result = fs.recipes_search(argument, max_results=5, page_number=5)
-#         else:
-#             result = fs.recipe_get(argument)
-#         result_json = json.dumps(result)
-#         f_out.write(result_json)
-
 from flask import request, Response, jsonify, Blueprint
+
 import mongodal
 import recipeshelper
 
 mongo = mongodal.MongoDAL()
+rhelper = recipeshelper.RecipesHelper()
+
 collection_name = "recipes"
 dishes_controller = Blueprint('dishes_controller', __name__)
 
@@ -28,10 +14,71 @@ dishes_controller = Blueprint('dishes_controller', __name__)
 def get_dish(dish_id):
     mongo.connect()
     try:
-        result =  mongo.find_one(collection_name, {"_id": dish_id})
-    except Exception as err_msg:
+        result = mongo.find_one(collection_name, {"fatsecret_id": dish_id})
+    except Exception:
         result = {}
 
     mongo.disconnect()
 
-    return jsonify(result)
+    return str(result)
+
+
+@dishes_controller.route("/list_dishes_general/<hour>", methods=['GET'])
+def list_dishes_general(hour):
+    dishes_for_now = list_dishes(hour)
+    result = sort_by_health(dishes_for_now)
+    return str(result)
+
+
+@dishes_controller.route("/list_dishes_for_user/<hour>/<user>", methods=['GET'])
+def list_dishes_for_user(hour, user):
+    dishes_for_now = list_dishes(hour)
+    result = sort_by_health_for_user(dishes_for_now, user)
+    return str(result)
+
+
+def hour_to_meal(hour):
+    if hour < 11:
+        return 0
+    elif hour < 16:
+        return 1
+    else:
+        return 2
+
+
+def is_dish_for_now(dish, meal):
+    meals = dish.get('meals')
+    if meals is not None:
+        return meal in meals
+    else:
+        return False
+
+
+def sort_by_health(dishes):
+    return dishes
+
+
+def sort_by_health_for_user(dishes, user):
+    return dishes
+
+
+def list_dishes(hour):
+    mongo.connect()
+
+    try:
+        cursor = mongo.find(collection_name, {})
+        meal = hour_to_meal(hour)
+        dishes_for_now = [dish for dish in cursor if is_dish_for_now(dish, meal)]
+
+        for dish in dishes_for_now:
+            try:
+                dish['recipe'] = rhelper.get_recipe_by_id(dish['fatsecret_id'])
+            except Exception:
+                dish['recipe'] = {}
+
+        return dishes_for_now
+
+    except Exception:
+        return {}
+    finally:
+        mongo.disconnect()

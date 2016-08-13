@@ -9,9 +9,5 @@ app.register_blueprint(dishes_controller, url_prefix='/dishes')
 app.register_blueprint(users_controller, url_prefix='/users')
 
 
-@app.route('/')
-def hello():
-    return "Hello Panda"
-
 if __name__ == "__main__":
     app.run("0.0.0.0", 8080)
