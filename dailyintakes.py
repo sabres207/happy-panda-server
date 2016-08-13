@@ -1,4 +1,6 @@
-import ingredientscontroller
+import recipeshelper
+
+helper = recipeshelper.RecipesHelper()
 
 fat_secret_nutritions = [
     'calories',  # kcal
@@ -51,7 +53,7 @@ women_nutritions_guides = {
 
 
 def meal_id_to_obj(mealid):
-    return ingredientscontroller.get_by_id(mealid)
+    return helper.get_recipe_by_id(mealid)
 
 
 def meal_to_intakes(sumintakes, meal):

@@ -50,6 +50,20 @@ class MongoDAL(object):
     def db(self):
         return self.client[self.database]
 
+    def update_one(self, collection_name, where, set_value):
+        try:
+            result = self.client[self.database][collection_name].update_one(
+                where,
+                {
+                    "$set": set_value,
+                    "$currentDate": {"lastModified": True}
+                }
+            )
+
+            return result
+        except:
+            return None
+
 
 def usemain(key, value):
     mongodal = MongoDAL()
