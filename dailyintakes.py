@@ -2,6 +2,19 @@ import recipeshelper
 
 helper = recipeshelper.RecipesHelper()
 
+higher_nutritions = [
+    'calories',  # kcal
+    'carbohydrate',  # grams
+    'protein',  # grams
+    'saturated_fat',  # grams
+    'trans_fat',  # grams
+    'cholesterol',  # milligrams
+    'sodium',  # milligrams
+    'potassium',  # milligrams
+    'sugar',  # grams
+    'fibre'  # grams
+]
+
 fat_secret_nutritions = [
     'calories',  # kcal
     'carbohydrate',  # grams
@@ -24,32 +37,50 @@ fat_secret_percents = [
 ]
 
 men_nutritions_guides = {
-    'energy': 8700,  # kilojoules
+    'calories': 2500,
     'protein':  50,  # grams
     'fat':  70,  # grams
     'carbohydrate':  310,  # grams
-    'saturated_fat': 30,  # grams
+    'saturated_fat': 23,  # grams
     'sugar':  90,  # grams
-    'sodium':  2.3,  # grams
+    'sodium':  2300,  # milligrams
     'fibre':  30,  # grams
     'cholesterol':  300,  # milligrams
-    'potassium':  5000,  # milligrams
-    'iron': 8  # mg
+    'potassium':  5000  # milligrams 'iron': 8  # mg
 }
 
 women_nutritions_guides = {
-    'energy': 8700,  # kilojoules
-    'protein':  50,  # grams
+    'calories': 2000,
+    'protein':  46,  # grams
     'fat':  70,  # grams
     'carbohydrate':  310,  # grams
-    'saturated_fat': 20,  # grams
+    'saturated_fat': 23,  # grams
     'sugar':  90,  # grams
-    'sodium':  2.3,  # grams
+    'sodium':  2300,  # milligrams
     'fibre':  25,  # grams
     'cholesterol':  300,  # milligrams
-    'potassium':  5000,  # milligrams
-    'iron': 17  # mg
+    'potassium':  5000  # milligrams 'iron': 17  # mg
 }
+
+'''
+   status API example
+    {
+    "energy": 12,
+    "protein":  50,
+    "fat":  70,
+    "carbohydrate":  93.2,
+    "saturated_fat": 30.4,
+    "sugar":  90.2,
+    "sodium":  42.3,
+    "fibre":  30,
+    "cholesterol":  76,
+    "potassium":  22,
+  "vitamin_a": 90,
+  "vitamin_c": 10,
+  "calcium": 23,
+  "iron": 12
+}
+'''
 
 
 def meal_id_to_obj(mealid):
@@ -59,11 +90,17 @@ def meal_id_to_obj(mealid):
 def meal_to_intakes(sumintakes, meal):
     all_intakes = fat_secret_nutritions + fat_secret_percents
     for intake in all_intakes:
-        if intake in meal:
+        servings = {}
+        try:
+            servings = meal['serving_sizes']['serving']
+        except:
+            servings = {}
+
+        if intake in servings:
             if intake in sumintakes:
-                sumintakes[intake] += meal[intake]
+                sumintakes[intake] += float(servings[intake])
             else:
-                sumintakes[intake] = meal[intake]
+                sumintakes[intake] = float(servings[intake])
 
     return sumintakes
 
@@ -84,7 +121,8 @@ def sum_intakes(intakes, user, meals_len):
 
     for nutrition in user_guide:
         if nutrition in intakes:
-            new_intakes[nutrition] = (user_guide[nutrition] / intakes[nutrition]) * 100
+            # print nutrition, user_guide[nutrition], intakes[nutrition], (intakes[nutrition] / user_guide[nutrition]) * 100
+            new_intakes[nutrition] = (intakes[nutrition] / user_guide[nutrition]) * 100
 
     for nutrition in fat_secret_percents:
         if nutrition in intakes:
@@ -101,4 +139,7 @@ def status(user):
     meals = map(meal_id_to_obj, ids)
     intakes = reduce(meal_to_intakes, meals, {})
 
-    return sum_intakes(intakes, user, len(user['dail_meals']))
+    return sum_intakes(intakes, user, len(user['daily_meals']))
+
+
+#def compare_dishes(dish, other_dish):

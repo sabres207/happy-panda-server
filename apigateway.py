@@ -10,4 +10,4 @@ app.register_blueprint(users_controller, url_prefix='/users')
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", 9000)
+    app.run("0.0.0.0", 8080, threaded=True)

@@ -37,7 +37,10 @@ def get_user_status(username):
         user = get_user(username)
         return str(dailyintakes.status(user))
     except Exception as err:
-        return err
+        print 'err: '
+        print err
+        print err.args
+        return str(err)
 
 
 @users_controller.route('/user/<username>/meals', methods=['GET', 'POST'])  # POST params: { recipe_id: ID }
