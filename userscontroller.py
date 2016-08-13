@@ -1,4 +1,5 @@
-from flask import Flask, request, Response, jsonify, Blueprint
+from flask import Flask, request, Response, Blueprint
+from encodejson import jsonify
 import mongodal
 import dailyintakes
 
@@ -26,7 +27,7 @@ def get_user(username):
 @users_controller.route('/user/<username>', methods=['GET'])
 def handle_user(username):
     try:
-        return str(get_user(username))
+        return jsonify(get_user(username))
     except Exception as err:
         return err
 
@@ -35,12 +36,12 @@ def handle_user(username):
 def get_user_status(username):
     try:
         user = get_user(username)
-        return str(dailyintakes.status(user))
+        return jsonify(dailyintakes.status(user))
     except Exception as err:
         print 'err: '
         print err
         print err.args
-        return str(err)
+        return jsonify(err)
 
 
 @users_controller.route('/user/<username>/meals', methods=['GET', 'POST'])  # POST params: { recipe_id: ID }
@@ -49,7 +50,7 @@ def get_user_meals(username):
         user = get_user(username)
         user_dict = {"username": username}
         if request.method == 'GET':
-            return str(user['daily_meals'])
+            return jsonify(user['daily_meals'])
         if request.method == 'POST':
             newmeals = [request.form['recipe_id']]
             if 'daily_meals' in user:
@@ -67,6 +68,6 @@ def delete_user_meal(username, index):
             user = get_user(username)
             user_dict = {"username": username}
             newmeals = user['daily_meals'].pop(index)
-            return str(mongo.update_one(collection, user_dict, {'daily_meals': newmeals}))
+            return jsonify(mongo.update_one(collection, user_dict, {'daily_meals': newmeals}))
     except Exception as err:
         return err

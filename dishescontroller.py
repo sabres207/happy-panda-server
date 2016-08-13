@@ -1,4 +1,5 @@
-from flask import request, Response, jsonify, Blueprint
+from flask import request, Response, Blueprint
+from encodejson import jsonify
 
 import mongodal
 import recipeshelper
@@ -20,21 +21,21 @@ def get_dish(dish_id):
 
     mongo.disconnect()
 
-    return str(result)
+    return jsonify(result)
 
 
 @dishes_controller.route("/list_dishes_general/<hour>", methods=['GET'])
 def list_dishes_general(hour):
     dishes_for_now = list_dishes(hour)
     result = sort_by_health(dishes_for_now)
-    return str(result)
+    return jsonify(result)
 
 
 @dishes_controller.route("/list_dishes_for_user/<hour>/<user>", methods=['GET'])
 def list_dishes_for_user(hour, user):
     dishes_for_now = list_dishes(hour)
     result = sort_by_health_for_user(dishes_for_now, user)
-    return str(result)
+    return jsonify(result)
 
 
 def hour_to_meal(hour):
