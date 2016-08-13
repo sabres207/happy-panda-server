@@ -2,6 +2,19 @@ import recipeshelper
 
 helper = recipeshelper.RecipesHelper()
 
+higher_nutritions = [
+    'calories',  # kcal
+    'carbohydrate',  # grams
+    'protein',  # grams
+    'saturated_fat',  # grams
+    'trans_fat',  # grams
+    'cholesterol',  # milligrams
+    'sodium',  # milligrams
+    'potassium',  # milligrams
+    'sugar',  # grams
+    'fibre'  # grams
+]
+
 fat_secret_nutritions = [
     'calories',  # kcal
     'carbohydrate',  # grams
@@ -24,11 +37,11 @@ fat_secret_percents = [
 ]
 
 men_nutritions_guides = {
-    'energy': 8700,  # kilojoules
+    'calories': 2500,
     'protein':  50,  # grams
     'fat':  70,  # grams
     'carbohydrate':  310,  # grams
-    'saturated_fat': 30,  # grams
+    'saturated_fat': 23,  # grams
     'sugar':  90,  # grams
     'sodium':  2300,  # milligrams
     'fibre':  30,  # grams
@@ -37,11 +50,11 @@ men_nutritions_guides = {
 }
 
 women_nutritions_guides = {
-    'energy': 8700,  # kilojoules
+    'calories': 2000,
     'protein':  46,  # grams
     'fat':  70,  # grams
     'carbohydrate':  310,  # grams
-    'saturated_fat': 20,  # grams
+    'saturated_fat': 23,  # grams
     'sugar':  90,  # grams
     'sodium':  2300,  # milligrams
     'fibre':  25,  # grams
