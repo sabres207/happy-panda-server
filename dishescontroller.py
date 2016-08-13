@@ -23,24 +23,24 @@ def get_dish(dish_id):
     return str(result)
 
 
-@dishes_controller.route("/list_dishes_general/<hour>", methods=['GET'])
-def list_dishes_general(hour):
-    dishes_for_now = list_dishes(hour)
-    result = sort_by_health(dishes_for_now)
-    return str(result)
+@dishes_controller.route("/", methods=['GET'])
+def list_dishes_general():
+    hour = int(request.args.get("hour"))
+    user = request.args.get("user")
 
-
-@dishes_controller.route("/list_dishes_for_user/<hour>/<user>", methods=['GET'])
-def list_dishes_for_user(hour, user):
     dishes_for_now = list_dishes(hour)
-    result = sort_by_health_for_user(dishes_for_now, user)
+    if user is not None:
+        result = sort_by_health_for_user(dishes_for_now, user)
+    else:
+        result = sort_by_health(dishes_for_now)
+
     return str(result)
 
 
 def hour_to_meal(hour):
-    if hour < 11:
+    if 4 < hour <= 11:
         return 0
-    elif hour < 16:
+    elif 11 < hour <= 16:
         return 1
     else:
         return 2
