@@ -41,6 +41,9 @@ class MongoDAL(object):
     def format_uri(self):
         return self.mongouri.format(self.username, self.password, self.ip, self.database, self.auth_mechanism)
 
+    def db(self):
+        return self.client[self.database]
+
 
 def usemain(key, value):
     mongodal = MongoDAL()
