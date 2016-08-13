@@ -1,7 +1,9 @@
 from flask import Flask, request, Response, jsonify
 import mongodal
+import dailyintakes
 
 mongo = mongodal.MongoDAL()
+
 app = Flask(__name__)
 collection = "users"
 
@@ -55,18 +57,24 @@ def handle_user(username):
 def get_user_status(username):
     try:
         user = get_user(username)
-        #TODO:elad
-        user['daily_meals']
+        return str(dailyintakes.status(user))
     except Exception as err:
         return err
 
 
-@app.route('/user/<username>/meals', methods=['GET'])
+@app.route('/user/<username>/meals', methods=['GET', 'POST'])  # post - { recipe_id: ID }
 def get_user_meals(username):
     try:
+        user = get_user(username)
+        user_dict = {"username": username}
         if request.method == 'GET':
-            user = get_user(username)
             return str(user['daily_meals'])
+        if request.method == 'POST':
+            newmeals = [request.form['recipe_id']]
+            if 'daily_meals' in user:
+                newmeals = newmeals + user['daily_meals']
+
+            update_one('users', user_dict, newmeals)
     except Exception as err:
         return err
 
