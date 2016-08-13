@@ -38,6 +38,12 @@ class MongoDAL(object):
         else:
             raise MongoError("client is not connected")
 
+    def find_one(self, collection_name, dict_to_find):
+        if self.client is not None:
+            return self.client[self.database][collection_name].find_one(dict_to_find)
+        else:
+            raise MongoError("client is not connected")
+
     def format_uri(self):
         return self.mongouri.format(self.username, self.password, self.ip, self.database, self.auth_mechanism)
 
